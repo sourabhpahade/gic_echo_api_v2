@@ -1,0 +1,209 @@
+{
+  "main": {
+    "id": "e8ff3a64e81fca70",
+    "type": "split",
+    "children": [
+      {
+        "id": "2d4ba40f60282f47",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bc7c723eba20e7d0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index.md"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1f27003d81f6ec07",
+    "type": "split",
+    "children": [
+      {
+        "id": "b4086d1a426c92f7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f1e6da9bf5bd52ee",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "ae60dea11823ca90",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f8c7ea1918a07f03",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f40578cceb487a95",
+    "type": "split",
+    "children": [
+      {
+        "id": "8332d16ba6fee911",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "87df58217d9eb151",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "d6a94845c0b0adfd",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "92eba7e563ae4f1d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "babe3de55b1777ab",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "62a9e661843f23fc",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "bc7c723eba20e7d0",
+  "lastOpenFiles": [
+    "mdms_db_okf_bundle/index.md.md",
+    "mdms_db_okf_bundle/mdms_master_db/l_consumer_lookup.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_BillCycle.md",
+    "l_consumer_table.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_BillingSource.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_Connection_Category.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_Connection_Status.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_ConnectionType.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
+    "mdms_db_okf_bundle/mdms_master_db/M_SL_TYPE.md",
+    "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+    "mdms_db_okf_bundle/mdms_master_db/l_meter_lookup.md",
+    "mdms_master_db/l_consumer_table.md",
+    "mdms_master_db",
+    "mdms_master_db/l_meter_lookup.md"
+  ]
+}
