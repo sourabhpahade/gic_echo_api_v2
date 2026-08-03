@@ -8,7 +8,7 @@ app = FastAPI(title="GIS ECHO API")
 app.include_router(query_router)  # Include the router from query_controller.py
 
 # endpoints
-@app.get("/") 
+@app.get("/handshake") 
 async def root() : 
     return {"message": "Hello World"}
 

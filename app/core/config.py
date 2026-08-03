@@ -1,15 +1,16 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    bundle_path: str = "./okf_bundles" # Fallback if .env is missing
-
-    routing_llm_base_url: str = "http://localhost:11434/v1"
-    routing_llm_model_name: str = "sqlcoder"
-    routing_llm_api_key: str = "local" # not in use for local llm, just a placeholder for future use
-
-    sql_dialect: str = "MS SQL Server (T-SQL)"
+     
+    # Local Ollama Settings 
+    ollama_base_url: str = "http://localhost:11434"
+    router_model_name: str = "okf-router"
     
+    # OKF Bundles Root Directory
+    okf_bundles_dir: str = "./okf_bundles"
+
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()

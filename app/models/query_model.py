@@ -1,13 +1,12 @@
+from pydantic import BaseModel
 from typing import List
 
-from pydantic import BaseModel
+class QueryRequest(BaseModel):
+    user_input: str
 
-class UserQueryRequest(BaseModel):
-    question: str
-
-class UserQueryResponse(BaseModel):
+class QueryResponse(BaseModel):
     status: str
-    user_question: str
-    tables_found_in_folder: List[str]
-    generated_sql: str
-   # pruned_schemas: List[str]
+    selected_databases: List[str]
+    seed_tables: List[str]
+    all_resolved_tables: List[str]
+    assembled_context: str

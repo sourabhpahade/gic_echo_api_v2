@@ -11,14 +11,10 @@
             "id": "bc7c723eba20e7d0",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "index.md"
+              "title": "New tab"
             }
           }
         ]
@@ -99,7 +95,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -118,7 +113,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -161,7 +155,6 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "mdms_db_okf_bundle/mdms_master_db/index.md.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -190,6 +183,9 @@
   },
   "active": "bc7c723eba20e7d0",
   "lastOpenFiles": [
+    "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+    "mdms_db_okf_bundle/mdms_master_db/index.md",
+    "mdms_db_okf_bundle/index.md",
     "mdms_db_okf_bundle/index.md.md",
     "mdms_db_okf_bundle/mdms_master_db/l_consumer_lookup.md",
     "mdms_db_okf_bundle/mdms_master_db/M_BillCycle.md",
@@ -200,7 +196,6 @@
     "mdms_db_okf_bundle/mdms_master_db/M_ConnectionType.md",
     "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
     "mdms_db_okf_bundle/mdms_master_db/M_SL_TYPE.md",
-    "mdms_db_okf_bundle/mdms_master_db/index.md.md",
     "mdms_db_okf_bundle/mdms_master_db/l_meter_lookup.md",
     "mdms_master_db/l_consumer_table.md",
     "mdms_master_db",

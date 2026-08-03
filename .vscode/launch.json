@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: MVC App",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn", 
+            "cwd": "${workspaceFolder}/app", // Changes execution context to the app folder
+            "args": [
+                "main:app", // Points to your-root-folder/app/main.py
+                "--reload"
+            ],
+            "subProcess": true,
+            "jinja": true
+        }
+    ]
+}
