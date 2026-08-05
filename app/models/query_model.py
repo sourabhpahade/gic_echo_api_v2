@@ -1,12 +1,11 @@
 from pydantic import BaseModel
-from typing import List
+from typing import Any, Dict, List
 
 class QueryRequest(BaseModel):
     user_input: str
 
 class QueryResponse(BaseModel):
-    status: str
-    selected_databases: List[str]
+    status: str 
     seed_tables: List[str]
-    all_resolved_tables: List[str]
-    assembled_context: str
+    pruned_schema: Dict[str, Any]
+    sqlcoder_prompt: str

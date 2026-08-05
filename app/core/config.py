@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     # Local Ollama Settings 
     ollama_base_url: str = "http://localhost:11434"
     router_model_name: str = "okf-router"
+    sqlcoder_model_name: str = "okf-sqlcoder"
     
     # OKF Bundles Root Directory
     okf_bundles_dir: str = "./okf_bundles"

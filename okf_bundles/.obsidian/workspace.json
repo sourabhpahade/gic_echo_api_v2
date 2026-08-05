@@ -11,10 +11,14 @@
             "id": "bc7c723eba20e7d0",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
+                "mode": "source",
+                "source": true
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "M_PaymentType_Contract"
             }
           }
         ]
@@ -95,6 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,6 +118,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -155,6 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -183,11 +190,13 @@
   },
   "active": "bc7c723eba20e7d0",
   "lastOpenFiles": [
-    "mdms_db_okf_bundle/mdms_master_db/index.md.md",
-    "mdms_db_okf_bundle/mdms_master_db/index.md",
-    "mdms_db_okf_bundle/index.md",
-    "mdms_db_okf_bundle/index.md.md",
     "mdms_db_okf_bundle/mdms_master_db/l_consumer_lookup.md",
+    "mdms_db_okf_bundle/mdms_master_db/index.md",
+    "mdms_db_okf_bundle/mdms_master_db/l_meter_lookup.md",
+    "mdms_db_okf_bundle/mdms_master_db/relationships.md",
+    "mdms_db_okf_bundle/index.md",
+    "mdms_db_okf_bundle/mdms_master_db/index.md.md",
+    "mdms_db_okf_bundle/index.md.md",
     "mdms_db_okf_bundle/mdms_master_db/M_BillCycle.md",
     "l_consumer_table.md",
     "mdms_db_okf_bundle/mdms_master_db/M_BillingSource.md",
@@ -196,7 +205,6 @@
     "mdms_db_okf_bundle/mdms_master_db/M_ConnectionType.md",
     "mdms_db_okf_bundle/mdms_master_db/M_PaymentType_Contract.md",
     "mdms_db_okf_bundle/mdms_master_db/M_SL_TYPE.md",
-    "mdms_db_okf_bundle/mdms_master_db/l_meter_lookup.md",
     "mdms_master_db/l_consumer_table.md",
     "mdms_master_db",
     "mdms_master_db/l_meter_lookup.md"
