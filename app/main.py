@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from controllers.query_controller import router as query_router
 
+
 # initialize FastAPI app
 app = FastAPI(title="GIS ECHO API")
 
