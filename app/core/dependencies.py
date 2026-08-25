@@ -4,6 +4,7 @@ from services.llm_router_service import LLMRouterService
 from services.helper_service import HelperService
 from services.sql_execution_service import SQLExecutionService
 from services.data_analysis_service import DataAnalysisService
+from services.pageindex_service import PageIndexService
 
 def get_llm_router_service() -> LLMRouterService:
     return LLMRouterService( 
@@ -19,3 +20,6 @@ def get_sql_execution_service() -> SQLExecutionService:
 
 def get_data_analysis_service() -> DataAnalysisService:
     return DataAnalysisService()
+
+def get_page_index_service() -> PageIndexService:
+    return PageIndexService()

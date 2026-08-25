@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     DB_QUERY_TIMEOUT : int = 15
     DB_FETCH_LIMIT : int = 100  # Set to -1 to fetch all records
 
+    page_index_storage : str = ""
+    page_index_bundle : str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"
