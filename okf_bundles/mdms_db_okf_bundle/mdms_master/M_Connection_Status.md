@@ -1,23 +1,21 @@
 ---
 type: Table
-title: M_Connection_Status
-description: [Add general description of this table's purpose, e.g., Master table defining the various connection and relay statuses for consumer meters.]
+title: m_connection_status
+description: Master lookup table defining the physical connectivity states of smart meters (e.g., Connected, Disconnected).
 database: mdms_master
 default_alias: mcs
 tags: 
 - connection status
-- master table
-- connect
-- disconnect
+- active
+- disconnected
+- state
 ---
 
-# Table: M_Connection_Status
+# Table: m_connection_status
 
 ## Description
-[Add business context here: e.g., This is a lookup table used to map integer status codes to human-readable connection states like "Connected", "Disconnected", or "Permanently Disconnected".]
+This master lookup table defines the available connectivity statuses for a consumer's smart meter. It is used to filter consumers who are currently receiving power versus those who have been temporarily or permanently disconnected.
 
 ## Columns
-* **ConnectionStatus_TblRefID** (smallint): [Add description]
-* **ConnectionStatus_Name** (varchar): [Add description]
-* **IsActive** (bit, Enum: `0`='False', `1`='True'): [Add description]
-* **ShortName** (varchar): [Add description]
+* **ConnectionStatus_TblRefID** (smallint, Enum: `1`='Connected', `2`='Disconnected', `3`='Permanent Disconnection'): PRIMARY KEY. Unique identifier for the connectivity state.
+* **ConnectionStatus_Name** (varchar, Enum: `Connected`, `Disconnected`, `Permanent Disconnection`): The full descriptive name of the connectivity state.

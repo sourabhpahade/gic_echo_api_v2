@@ -1,23 +1,21 @@
 ---
 type: Table
-title: M_PaymentType_Contract
-description: [Add general description of this table's purpose, e.g., Master table defining the payment modes or contract types for consumers.]
+title: m_paymenttype_contract
+description: Master lookup table defining the payment contract types (Prepaid vs. Postpaid) for consumers.
 database: mdms_master
 default_alias: mptc
 tags: 
 - payment contract
 - prepaid
 - postpaid
-- master table
+- payment mode
 ---
 
-# Table: M_PaymentType_Contract
+# Table: m_paymenttype_contract
 
 ## Description
-[Add business context here: e.g., This lookup table specifies whether a consumer is on a prepaid or postpaid payment contract.]
+This master lookup table defines the available payment contract types for consumers. It is primarily used to distinguish between Prepaid and Postpaid accounts across the system.
 
 ## Columns
-* **PaymentContract_TblRefID** (int): [Add description]
-* **PaymentContract_Code** (varchar): [Add description]
-* **PaymentContract_Name** (varchar): [Add description]
-* **IsActiveStatus** (bit, Enum: `0`='False', `1`='True'): [Add description]
+* **PaymentContract_TblRefID** (int, Enum: `1`='Postpaid', `2`='Prepaid'): PRIMARY KEY. Unique identifier for the payment contract type.
+* **PaymentContract_Name** (varchar, Enum: `Postpaid`, `Prepaid`): The descriptive name of the payment contract.

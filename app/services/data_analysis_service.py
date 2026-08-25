@@ -45,7 +45,6 @@ class DataAnalysisService:
 
         # 3. Prompt Construction
         messages = [
-            {"role": "system", "content": self.SYSTEM_PROMPT},
             {
                 "role": "user", 
                 "content": (
@@ -53,7 +52,7 @@ class DataAnalysisService:
                     f"Database Results (Max {settings.DB_FETCH_LIMIT} rows shown):\n"
                     f"{data_json_string}"
                 )
-            },
+            }
         ]
 
         # 4. LLM Inference

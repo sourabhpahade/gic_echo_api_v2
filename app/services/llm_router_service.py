@@ -18,7 +18,7 @@ class LLMRouterService :
         if not formatted_url.endswith("/v1"):
             formatted_url += "/v1"
 
-        self.client = AsyncOpenAI(base_url=formatted_url, api_key="ollama")
+        self.client = AsyncOpenAI(base_url=formatted_url, api_key="ollama",default_headers={"ngrok-skip-browser-warning": "true"})
         self.model_name = model_name
         self.sql_model_name = settings.sqlcoder_model_name or "sqlcoder"
 
@@ -34,7 +34,9 @@ class LLMRouterService :
                 ],
                 temperature=0.0,
                 max_tokens=1500,
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"},
+                # Inject native Ollama options using extra_body
+                extra_body={"options": {"num_ctx": 8192}}
             )
 
             result_text = response.choices[0].message.content or ""
@@ -174,36 +176,6 @@ class LLMRouterService :
 
 
         # 3. System Prompt requiring a "Master Plan"
-        """
-        system_prompt = (
-             "You are a highly precise database table routing agent for an enterprise Text-to-SQL system.\n"
-             "Your task is to analyze a User Query, combined Database Indexes, and Relationships files from one or more databases.\n"
-             "You must determine WHICH specific table markdown files contain the data necessary to answer the query.\n\n"
-             "CRITICAL RULES:\n"
-             "1. Base your decision ONLY on the table descriptions, keywords, and relations provided.\n"
-             "2. If the query is gibberish or does not map to ANY table, return an empty list.\n"
-             "3. You MUST return ONLY a valid JSON object matching the exact schema below.\n\n"
-             "REQUIRED JSON SCHEMA:\n"
-             "{\n"
-             "  \"reasoning\": \"Step 1: Write a detailed Master Plan. Explain why these tables are needed. CRITICAL: If you select more than one table, you MUST explicitly state the relationship/join logic between them based on the Relationships file.\",\n"
-             "  \"relevant_tables\": [\"Step 2: List the exact file paths here, or leave empty [] if no match.\"]\n"
-             "}\n\n"
-             "EXAMPLES:\n"
-             "User Query: 'what is the count of total prepaid consumers?'\n"
-             "Output:\n"
-             "{\n"
-             "  \"reasoning\": \"We need l_consumer_lookup for consumer counts, which joins to M_PaymentType_Contract via the Payment Contract Status to identify prepaid users.\",\n"
-             "  \"relevant_tables\": [\"./mdms_master/l_consumer_lookup.md\", \"./mdms_master/M_PaymentType_Contract.md\"]\n"
-             "}\n\n"
-             "User Query: 'string'\n"
-             "Output:\n"
-             "{\n"
-             "  \"reasoning\": \"The query 'string' is a generic test input and does not match any table descriptions.\",\n"
-             "  \"relevant_tables\": []\n"
-             "}"
-        )
-        """
-
         system_prompt = (
             "You are a highly capable database table routing agent for an enterprise Text-to-SQL system.\n"
             "Your task is to analyze a User Query, combined Database Indexes, and Relationships files from one or more databases.\n"
@@ -211,27 +183,29 @@ class LLMRouterService :
             "CRITICAL RULES:\n"
             "1. CONCEPTUAL MATCHING: The user query may use domain terms (e.g., 'installed', 'billed', 'units', 'metered') that live in related entity tables (e.g., meter lookup, device, consumer lookup). Select all candidate tables likely to contain relevant attributes or join keys.\n"
             "2. RELATIONSHIP TRAVERSAL: If the query requires entities that must be joined (e.g., consumer details + meter installation), select all intermediate tables required to complete the join path as defined in the Relationships file.\n"
-            "3. EMPTY LIST ONLY FOR IRRELEVANT QUERIES: Return an empty list `[]` ONLY if the query is complete gibberish (e.g., 'test', 'asdf') or completely outside the domain of the database.\n"
-            "4. Output ONLY a valid JSON object matching the exact schema below.\n\n"
+            "3. EXACT PATH MATCHING (CRITICAL): You must ONLY output the exact file paths exactly as they are written in the provided Database Indexes. NEVER guess, invent, or mix folder names (e.g., do not output 'prepaid/l_meter_lookup.md' if the index lists it under 'mdms_master/').\n"
+            "4. EXCLUDE METADATA FILES: NEVER include `relationships.md` or `index.md` in the `relevant_tables` array. The array must ONLY contain actual table schema files.\n"
+            "5. EMPTY LIST ONLY FOR IRRELEVANT QUERIES: Return an empty list `[]` ONLY if the query is complete gibberish (e.g., 'test', 'asdf') or completely outside the domain of the database.\n"
+            "6. Output ONLY a valid JSON object matching the exact schema below.\n\n"
             "REQUIRED JSON SCHEMA:\n"
             "{\n"
             "  \"reasoning\": \"Step 1: Write a detailed Master Plan explaining which tables and joins will satisfy the query.\",\n"
-            "  \"relevant_tables\": [\"Step 2: List the exact file paths here, or leave empty [] if completely unrelated.\"]\n"
+            "  \"relevant_tables\": [\"Step 2: List the EXACT table file paths from the provided index here, or leave empty [] if completely unrelated.\"]\n"
             "}\n"
             "EXAMPLES:\n"
-             "User Query: 'what is the count of total prepaid consumers?'\n"
-             "Output:\n"
-             "{\n"
-             "  \"reasoning\": \"We need l_consumer_lookup for consumer counts, which joins to M_PaymentType_Contract via the Payment Contract Status to identify prepaid users.\",\n"
-             "  \"relevant_tables\": [\"./mdms_master_db/l_consumer_lookup.md\", \"./mdms_master_db/M_PaymentType_Contract.md\"]\n"
-             "}\n\n"
-             "User Query: 'string'\n"
-             "Output:\n"
-             "{\n"
-             "  \"reasoning\": \"The query 'string' is a generic test input and does not match any table descriptions.\",\n"
-             "  \"relevant_tables\": []\n"
-             "}"
-)
+            "User Query: 'give list of consumers for rc commands is still in progress.'\n"
+            "Output:\n"
+            "{\n"
+            "  \"reasoning\": \"We need s_meter_commanddetails from prepaid to find pending RC commands. This must be joined to l_meter_lookup in mdms_master, and then to l_consumer_lookup in mdms_master to get the final consumer names.\",\n"
+            "  \"relevant_tables\": [\"prepaid/s_meter_commanddetails.md\", \"mdms_master/l_meter_lookup.md\", \"mdms_master/l_consumer_lookup.md\"]\n"
+            "}\n\n"
+            "User Query: 'string'\n"
+            "Output:\n"
+            "{\n"
+            "  \"reasoning\": \"The query 'string' is a generic test input and does not match any table descriptions.\",\n"
+            "  \"relevant_tables\": []\n"
+            "}"
+        )
 
 
         # 4. Make a SINGLE LLM Call
@@ -293,54 +267,14 @@ class LLMRouterService :
                 continue
 
             # Build the Prompt for THIS specific table
-            """
-            system_prompt = (
-                "You are an expert database schema architect. Your job is to prune a single table's schema down to ONLY the essential columns needed for a specific user query.\n\n"
-                "CRITICAL RULES:\n"
-                "1. You MUST select columns that contain the data requested in the User Query.\n"
-                "2. You MUST ALSO select any Primary Keys or Foreign Keys required to join this table to the 'Other Selected Tables', based on the provided Master Plan and Relationships file.\n"
-                "3. Output ONLY a valid JSON object matching the exact schema below.\n\n"
-                "REQUIRED JSON SCHEMA:\n"
-                "{\n"
-                "  \"reasoning\": \"Explain which data columns you selected, and which key columns you selected to join to the other tables.\",\n"
-                "  \"pruned_columns\": [\n"
-                "       {\n"
-                "           \"column_name\": \"Exact name of the column\",\n"
-                "           \"description\": \"The description and data type of the column exactly as written in the markdown\"\n"
-                "       }\n"
-                "   ]\n"
-                "}"
-            )
-           
-
             system_prompt = (
                 "You are an expert data extraction agent. Your job is to prune a single table's schema down to ONLY the essential columns needed for a specific user query.\n\n"
                 "CRITICAL RULES:\n"
                 "1. You MUST select columns that contain the data requested in the User Query.\n"
                 "2. You MUST ALSO select any Primary Keys or Foreign Keys required to join this table to the 'Other Selected Tables', based on the provided Master Plan and Relationships file.\n"
-                "3. VERBATIM EXTRACTION: When providing the column name and description, you MUST COPY AND PASTE the exact text from the provided table markdown. DO NOT paraphrase, DO NOT summarize, and DO NOT add your own notes.\n"
-                "4. Output ONLY a valid JSON object matching the exact schema below.\n\n"
-                "REQUIRED JSON SCHEMA:\n"
-                "{\n"
-                "  \"reasoning\": \"Explain which data columns you selected, and which key columns you selected to join to the other tables.\",\n"
-                "  \"pruned_columns\": [\n"
-                "       {\n"
-                "           \"column_name\": \"Exact name of the column as written in the markdown.\",\n"
-                "           \"description\": \"COPY AND PASTE the exact description and data type from the markdown. DO NOT alter a single word.\"\n"
-                "       }\n"
-                "   ]\n"
-                "}"
-            )
-            """
-
-            system_prompt = (
-                "You are an expert data extraction agent. Your job is to prune a single table's schema down to ONLY the essential columns needed for a specific user query.\n\n"
-                "CRITICAL RULES:\n"
-                "1. You MUST select columns that contain the data requested in the User Query.\n"
-                "2. You MUST ALSO select any Primary Keys or Foreign Keys required to join this table to the 'Other Selected Tables', based on the provided Master Plan and Relationships file.\n"
-                "3. Output ONLY a valid JSON object matching the exact schema below.\n"
-                "4. STRICT EXTRACTION ONLY: You may ONLY select columns that explicitly appear in the \"AVAILABLE COLUMNS\" list below.\n"
-                "5. NEVER INVENT COLUMNS: Do not guess, assume, or fabricate columns. If a concept from the User Query (e.g., 'Prepaid') is NOT in this specific table, IGNORE IT. Trust that another table in the Master Plan will provide it.\n"
+                "3. PRESERVE ENUMS & BUSINESS LOGIC (CRITICAL): When extracting a column, you MUST retain any 'Enum', 'Status', or specific value mappings provided in the markdown. The downstream SQL agent needs these exact mappings (e.g., 33='RC') to write valid SQL.\n"
+                "4. Output ONLY a valid JSON object matching the exact schema below.\n"
+                "5. STRICT EXTRACTION ONLY: You may ONLY select columns that explicitly appear in the table's markdown. NEVER hallucinate or invent columns (e.g., do not invent 'MSN' if it is not in the text).\n"
                 "6. PERFECT SCHEMA: Output ONLY valid JSON. Do not add keys, notes, or comments outside of the exact schema provided. Put ALL your assumptions solely in the 'selection_reason' string.\n\n"
                 "REQUIRED JSON SCHEMA:\n"
                 "{\n"
@@ -348,11 +282,11 @@ class LLMRouterService :
                 "  \"pruned_columns\": [\n"
                 "       {\n"
                 "           \"column_name\": \"Exact name of the column as written in the markdown.\",\n"
-                "           \"description\": \"CRITICAL: COPY AND PASTE the description EXACTLY as it appears in the markdown.\",\n"
+                "           \"description\": \"CRITICAL: COPY AND PASTE the ENTIRE description EXACTLY as it appears in the markdown, INCLUDING ALL '(int, Enum:...)' definitions and status mappings.\",\n"
                 "           \"selection_reason\": \"Explain why you selected this column. PUT ALL ASSUMPTIONS OR LOGIC HERE.\"\n"
                 "       }\n"
                 "   ]\n"
-                "}"
+                "}\n\n"
             )
 
             user_content = (

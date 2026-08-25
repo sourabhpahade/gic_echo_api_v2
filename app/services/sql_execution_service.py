@@ -1,10 +1,8 @@
 import re
 import pyodbc
 import asyncio
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from core.config import settings
-import json
-import pandas as pd
 
 class SQLExecutionError(Exception):
     """Custom exception raised when SQL sanitization or execution fails."""

@@ -1,62 +1,61 @@
 ---
 type: Table
 title: l_consumer_lookup
-description: This table contains information about consumers present in meter data management system (mdms), including details consumer name, address, connection type, connection status along with various other attributes.
+description: Core table storing consumer profiles, statuses, contact details, and smart meter installation timestamps.
 database: mdms_master
 default_alias: lcl
 tags: 
 - consumer
 - rrnumber
 - consumer details
+- installation
 ---
 
 # Table: l_consumer_lookup
 
 ## Description
-This table contains information about consumers present in the meter data management system (mdms), including consumer name, address, connection type, connection status, and various other attributes.  
-In this table, the entry of records happens after smart meter installation is completed in a consumer's premise.  
+This table contains the primary information for consumers in the MDMS, including names, addresses, connectivity states, and physical attributes. 
 
 ## Columns
-* **Consumer_TblRefID** (int): Unique, incremental identity column used as the primary reference for this table.
-* **MeterLookup_TblRefId** (bigint): Defines the relationship between the consumer and the smart meter attached to them.
-* **RRNumber** (varchar): Unique Identifier number for each consumer.
+* **Consumer_TblRefID** (int): Unique internal identity number for each consumer.
+* **MeterLookup_TblRefId** (int): FOREIGN KEY to `l_meter_lookup`. Maps the smart meter attached to the consumer.
+* **RRNumber** (varchar): PRIMARY KEY. Unique identifier number used to identify the consumer.
 * **Consumer_Name** (nvarchar): Name of the consumer.
-* **Consumer_FatherName** (nvarchar): Name of consumer's father.
-* **ConnectionStatus_TblRefID** (smallint): Reference to connection status master table (connected, disconnected, or permanently disconnected).
-* **ConnectionCategory_TblRefID** (int): Reference to consumer category master table (tariff category).
-* **Consumer_Address** (nvarchar): Consumer's address.
-* **Consumer_Pincode** (varchar): Consumer's pincode.
-* **Consumer_MobileNumber** (varchar): Consumer's mobile number.
-* **Consumer_LandLineNumber** (varchar): Consumer's land line number.
-* **Consumer_Email** (varchar): Consumer's Email address.
-* **Account_ID** (varchar): Unique installation number assigned for the smart meter installation request.
-* **Sanctioned_Load_KW** (decimal): Maximum electrical power (kW/kVA) approved for the consumer.
-* **Bill_Day** (smallint): The day of the month (1-31) the consumer's bill is generated.
-* **BillcycleTblRefiID** (int): Reference to billing cycle master table (e.g., monthly, quarterly, yearly).
-* **PaymentContract_TblRefID** (int): Reference to payment contract master table (e.g., prepaid, postpaid).
-* **Nearest_AccountID** (varchar): Stores the rrnumber for old-to-smart meter installations, or NSC + account_id for new requests.
-* **SL_TYPE_ID** (smallint): Reference to sl type master table (unit of sanctioned load: kw, kva, watt, HP).
-* **Contract_Demand** (decimal): Specific amount of electrical power mutually agreed to be purchased by commercial/industrial consumers.
-* **ServicePointMeterType_TblRefID** (smallint): Reference to service point meter type table (e.g., 1 phase, 3 phase).
-* **ConnectionTypeTblRefID** (int): Reference to connection type master table (e.g., normal, government).
-* **isPrevilege** (tinyint, Enum: `0`='No', `1`='Yes'): Defines whether consumer is privilege. Disconnection is not allowed for a given time period.
-* **isStagger** (tinyint, Enum: `0`='No', `1`='Yes'): Defines whether consumer is staggered. Disconnection is not allowed for a given time period.
-* **Installment** (float): Installment amount deducting daily from InstallmentStartDate to InstallmentEndDate.
-* **InstallmentEndDate** (date): End date when deduction of installment amount stops.
-* **isForceDisconnect** (tinyint, Enum: `0`='No', `1`='Yes'): If Yes, consumer meter will not be connected even with a positive wallet balance.
-* **ForceDisconnectDateTime** (datetime): Date time when consumer was marked as force disconnected.
-* **EntryTimeStamp** (datetime): Date time when consumer was created in MDMS.
-* **Privilege_StartDate** (date): Start date for privilege functionality.
-* **Privilege_Enddate** (date): End date for privilege functionality.
-* **isTOD** (tinyint, Enum: `0`='No', `1`='Yes'): Defines whether TOD (Time of day) billing is enabled.
-* **MRU** (varchar): It defines in which MRU (Meter reading unit) a consumer belongs.
-* **MasterSyncDate** (datetime): Date when utility/discom shared the acknowledgment of installment data response.
-* **RC_DC_DateTime** (datetime): Date time of the last reconnection or disconnection.
-* **Stagger_Start_date** (datetime): Start date for stagger functionality.
-* **Stagger_End_date** (datetime): End date for stagger functionality.
-* **ServiceDate** (datetime): Date time when smart meter was installed in consumer's premise.
-* **isLRCF** (bit, Enum: `null`='not used', `0`='used by consumer', `1`='LRCF was reset'): State of Local Relay Connect Functionality.
-* **LRCF_UpdateDateTime** (datetime): Date time of latest action taken on LRCF (enabled or reset via command).
-* **InstallmentStartDate** (date): Start date of installment amount deduction.
-* **Installment_Received_DateTime** (datetime): Date time when the latest installment details were received.
-* **Discom_Push_Date** (datetime): It is a date time when the meter replacement response was pushed to utility.
+* **Consumer_FatherName** (nvarchar): Name of the consumer's father.
+* **ConnectionStatus_TblRefID** (smallint, Enum: `1`='connected', `2`='disconnected', `3`='permanent disconnected'): FOREIGN KEY to `m_connection_status`. Stores the connectivity state of the smart meter.
+* **ConnectionCategory_TblRefID** (int): FOREIGN KEY to `m_connection_category`. Stores information about the consumer's tariff category.
+* **Consumer_Address** (nvarchar): Consumer's physical address.
+* **Consumer_Pincode** (varchar): Consumer's postal pincode.
+* **Consumer_MobileNumber** (varchar): Consumer's mobile phone number.
+* **Consumer_Email** (varchar): Consumer's email address.
+* **Account_ID** (varchar): Unique installation number for the consumer.
+* **Sanctioned_Load_KW** (decimal): Sanctioned electrical load of the consumer (in kW).
+* **PaymentContract_TblRefID** (int, Enum: `1`='postpaid', `2`='prepaid'): FOREIGN KEY to `m_paymenttype_contract`. Defines the consumer's payment type.
+* **Nearest_AccountID** (varchar): Nearest account ID. If prefixed with 'NSC', it denotes a New Service Connection.
+* **SL_TYPE_ID** (smallint): FOREIGN KEY to `m_sl_type`. Unit of measurement for sanctioned load and contract demand.
+* **Contract_Demand** (decimal): Contract demand of the consumer.
+* **isPrevilege** (tinyint, Enum: `0`='No', `1`='Yes'): Indicates if the consumer has privilege status (exempt from disconnection).
+* **Privilege_StartDate** (date): Start date of the privilege period (applicable when isPrevilege = 1).
+* **Privilege_Enddate** (date): End date of the privilege period (applicable when isPrevilege = 1).
+* **isStagger** (tinyint, Enum: `0`='No', `1`='Yes'): Indicates if the consumer has a staggered disconnection schedule.
+* **Stagger_Start_date** (datetime): Start date of the stagger period (applicable when isStagger = 1).
+* **Stagger_End_date** (datetime): End date of the stagger period (applicable when isStagger = 1).
+* **Installment** (float): Installment amount to be deducted daily.
+* **InstallmentStartDate** (date): Start date from which the daily installment deduction begins.
+* **InstallmentEndDate** (date): End date when the installment deduction stops.
+* **Installment_Received_DateTime** (datetime): Date and time when the latest installment details were received.
+* **isForceDisconnect** (tinyint, Enum: `0`='No', `1`='Yes'): Indicates if the consumer is marked for forced disconnection.
+* **ForceDisconnectDateTime** (datetime): Date and time when the consumer was force-disconnected (applicable when isForceDisconnect = 1).
+* **EntryTimeStamp** (datetime): Timestamp when the consumer was created in the system.
+* **isTOD** (tinyint, Enum: `0`='No', `1`='Yes'): Indicates if Time of Day (TOD) billing is enabled for the consumer.
+* **MRU** (varchar): Name of the Meter Reading Unit to which the consumer belongs.
+* **MasterSyncDate** (datetime): Date and time when the consumer master sync was received from the utility/discom.
+* **RC_DC_DateTime** (datetime): Date and time when the consumer's smart meter was last connected (RC) or disconnected (DC).
+* **ServiceDate** (datetime): Date and time when the consumer's first smart meter was installed.
+* **isLRCF** (bit, Enum: `0`='No', `1`='Yes'): Indicates if Local Relay Connect Functionality is enabled (null is treated as No).
+* **LRCF_UpdateDateTime** (datetime): Date and time when LRCF was enabled (applicable when isLRCF = 1).
+* **Area_Type** (varchar, Enum: `NON-RAPDRP`, `RAPDRP`): Defines the area type of the consumer.
+* **Connection_Type** (varchar, Enum: `Permanent`, `Temporary`): Defines the nature of the consumer's connection.
+* **LoadType** (varchar, Enum: `SanctionLoad`, `ContractDemand`): Defines the load type category of the consumer.
+* **Discom_Push_Date** (datetime): Date and time when the meter installation details were pushed to the utility/discom.
+* **accntstatus_tblrefid** (int, Enum: `1`='regular (CD)', `2`='temporary disconnected (TD)', `3`='permanent disconnected (PD)'): Stores the current account status of the consumer.

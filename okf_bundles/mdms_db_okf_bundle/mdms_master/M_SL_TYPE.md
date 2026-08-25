@@ -1,20 +1,23 @@
 ---
 type: Table
-title: M_SL_TYPE
-description: [Add general description of this table's purpose, e.g., Master table storing the units of measurement for a consumer's sanctioned load.]
+title: m_sl_type
+description: Master lookup table defining the units of measurement for sanctioned load and contract demand (e.g., KW, KVA, HP).
 database: mdms_master
-default_alias: msl
+default_alias: mslt
 tags: 
 - sanctioned load
-- units
-- master table
+- load unit
+- kw
+- kva
+- hp
+- watt
 ---
 
-# Table: M_SL_TYPE
+# Table: m_sl_type
 
 ## Description
-[Add business context here: e.g., This lookup table defines the specific unit types used for power measurements, such as kW (kilowatts), kVA (kilovolt-amperes), or HP (horsepower).]
+This master lookup table defines the units of electrical power measurement used to represent a consumer's Sanctioned Load or Contract Demand. It ensures standardized calculations across different connection types.
 
 ## Columns
-* **SL_TYPE_ID** (smallint): [Add description]
-* **SL_TYPE_NAME** (varchar): [Add description]
+* **SL_TYPE_ID** (smallint, Enum: `1`='KW', `2`='KVA', `3`='HP', `4`='W'): PRIMARY KEY. Unique identifier for the sanctioned load unit of measurement.
+* **SL_TYPE_NAME** (varchar, Enum: `KW`, `KVA`, `HP`, `W`): The standard abbreviation/name of the electrical power unit.
