@@ -1,0 +1,278 @@
+{
+  "doc_name": "mdms",
+  "line_count": 208,
+  "structure": [
+    {
+      "title": "Database: mdms_master (Core consumer profiles, statuses, contact details, and payment types)",
+      "node_id": "0000",
+      "line_num": 1,
+      "nodes": [
+        {
+          "title": "Tables",
+          "node_id": "0001",
+          "line_num": 3,
+          "nodes": [
+            {
+              "title": "Table: m_paymenttype_contract (Master lookup for payment contract types)",
+              "node_id": "0002",
+              "line_num": 5,
+              "nodes": [
+                {
+                  "title": "Column: PaymentContract_TblRefID (Unique Payment Contract ID)",
+                  "node_id": "0003",
+                  "line_num": 6
+                },
+                {
+                  "title": "Column: PaymentContract_Name (Payment Contract Name)",
+                  "node_id": "0004",
+                  "line_num": 12
+                }
+              ]
+            },
+            {
+              "title": "Table: l_consumer_lookup (Consumer master records, attributes, and settings)",
+              "node_id": "0005",
+              "line_num": 17,
+              "nodes": [
+                {
+                  "title": "Column: Consumer_TblRefID (Internal Consumer ID)",
+                  "node_id": "0006",
+                  "line_num": 18
+                },
+                {
+                  "title": "Column: MeterLookup_TblRefId (Smart Meter Reference)",
+                  "node_id": "0007",
+                  "line_num": 22
+                },
+                {
+                  "title": "Column: RRNumber (Consumer ID / Account Number)",
+                  "node_id": "0008",
+                  "line_num": 27
+                },
+                {
+                  "title": "Column: Consumer_Name (Consumer Name)",
+                  "node_id": "0009",
+                  "line_num": 32
+                },
+                {
+                  "title": "Column: Consumer_FatherName (Father's Name)",
+                  "node_id": "0010",
+                  "line_num": 36
+                },
+                {
+                  "title": "Column: ConnectionStatus_TblRefID (Connectivity State)",
+                  "node_id": "0011",
+                  "line_num": 40
+                },
+                {
+                  "title": "Column: ConnectionCategory_TblRefID (Tariff Category Reference)",
+                  "node_id": "0012",
+                  "line_num": 46
+                },
+                {
+                  "title": "Column: Consumer_Address (Physical Address)",
+                  "node_id": "0013",
+                  "line_num": 51
+                },
+                {
+                  "title": "Column: Consumer_Pincode (Postal Pincode)",
+                  "node_id": "0014",
+                  "line_num": 55
+                },
+                {
+                  "title": "Column: Consumer_MobileNumber (Mobile Phone Number)",
+                  "node_id": "0015",
+                  "line_num": 59
+                },
+                {
+                  "title": "Column: Consumer_Email (Email Address)",
+                  "node_id": "0016",
+                  "line_num": 63
+                },
+                {
+                  "title": "Column: Account_ID (Installation Number)",
+                  "node_id": "0017",
+                  "line_num": 67
+                },
+                {
+                  "title": "Column: Sanctioned_Load_KW (Sanctioned Load)",
+                  "node_id": "0018",
+                  "line_num": 71
+                },
+                {
+                  "title": "Column: PaymentContract_TblRefID (Payment Mode Reference)",
+                  "node_id": "0019",
+                  "line_num": 75
+                },
+                {
+                  "title": "Column: Nearest_AccountID (Nearest Account Identifier)",
+                  "node_id": "0020",
+                  "line_num": 81
+                },
+                {
+                  "title": "Column: SL_TYPE_ID (Sanctioned Load Unit Reference)",
+                  "node_id": "0021",
+                  "line_num": 85
+                },
+                {
+                  "title": "Column: Contract_Demand (Contract Demand Value)",
+                  "node_id": "0022",
+                  "line_num": 90
+                },
+                {
+                  "title": "Column: isPrevilege (Privilege Status Indicator)",
+                  "node_id": "0023",
+                  "line_num": 94
+                },
+                {
+                  "title": "Column: Privilege_StartDate (Privilege Start Date)",
+                  "node_id": "0024",
+                  "line_num": 99
+                },
+                {
+                  "title": "Column: Privilege_Enddate (Privilege End Date)",
+                  "node_id": "0025",
+                  "line_num": 103
+                },
+                {
+                  "title": "Column: isStagger (Stagger Disconnection Schedule Indicator)",
+                  "node_id": "0026",
+                  "line_num": 107
+                },
+                {
+                  "title": "Column: Stagger_Start_date (Stagger Schedule Start Date)",
+                  "node_id": "0027",
+                  "line_num": 112
+                },
+                {
+                  "title": "Column: Stagger_End_date (Stagger Schedule End Date)",
+                  "node_id": "0028",
+                  "line_num": 116
+                },
+                {
+                  "title": "Column: Installment (Daily Deduction Installment Amount)",
+                  "node_id": "0029",
+                  "line_num": 120
+                },
+                {
+                  "title": "Column: InstallmentStartDate (Installment Start Date)",
+                  "node_id": "0030",
+                  "line_num": 124
+                },
+                {
+                  "title": "Column: InstallmentEndDate (Installment End Date)",
+                  "node_id": "0031",
+                  "line_num": 128
+                },
+                {
+                  "title": "Column: Installment_Received_DateTime (Installment Details Timestamp)",
+                  "node_id": "0032",
+                  "line_num": 132
+                },
+                {
+                  "title": "Column: isForceDisconnect (Forced Disconnection Indicator)",
+                  "node_id": "0033",
+                  "line_num": 136
+                },
+                {
+                  "title": "Column: ForceDisconnectDateTime (Forced Disconnection Timestamp)",
+                  "node_id": "0034",
+                  "line_num": 141
+                },
+                {
+                  "title": "Column: EntryTimeStamp (Record Creation Timestamp)",
+                  "node_id": "0035",
+                  "line_num": 145
+                },
+                {
+                  "title": "Column: isTOD (Time of Day Billing Indicator)",
+                  "node_id": "0036",
+                  "line_num": 149
+                },
+                {
+                  "title": "Column: MRU (Meter Reading Unit)",
+                  "node_id": "0037",
+                  "line_num": 154
+                },
+                {
+                  "title": "Column: MasterSyncDate (Utility Sync Timestamp)",
+                  "node_id": "0038",
+                  "line_num": 158
+                },
+                {
+                  "title": "Column: RC_DC_DateTime (Reconnection / Disconnection Timestamp)",
+                  "node_id": "0039",
+                  "line_num": 162
+                },
+                {
+                  "title": "Column: ServiceDate (First Installation Timestamp)",
+                  "node_id": "0040",
+                  "line_num": 166
+                },
+                {
+                  "title": "Column: isLRCF (Local Relay Connect Functionality Indicator)",
+                  "node_id": "0041",
+                  "line_num": 170
+                },
+                {
+                  "title": "Column: LRCF_UpdateDateTime (LRCF Enablement Timestamp)",
+                  "node_id": "0042",
+                  "line_num": 175
+                },
+                {
+                  "title": "Column: Area_Type (Area Classification)",
+                  "node_id": "0043",
+                  "line_num": 179
+                },
+                {
+                  "title": "Column: Connection_Type (Connection Nature)",
+                  "node_id": "0044",
+                  "line_num": 184
+                },
+                {
+                  "title": "Column: LoadType (Load Type Classification)",
+                  "node_id": "0045",
+                  "line_num": 189
+                },
+                {
+                  "title": "Column: Discom_Push_Date (Discom Push Timestamp)",
+                  "node_id": "0046",
+                  "line_num": 194
+                },
+                {
+                  "title": "Column: accntstatus_tblrefid (Current Account Status)",
+                  "node_id": "0047",
+                  "line_num": 198
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Relationships (Foreign Keys and Join Logic)",
+          "node_id": "0048",
+          "line_num": 203,
+          "nodes": [
+            {
+              "title": "Join: l_consumer_lookup to m_paymenttype_contract",
+              "node_id": "0049",
+              "line_num": 205
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "id": "mdms",
+  "name": "mdms",
+  "doc_id": "mdms",
+  "status": "ready",
+  "index_status": "completed",
+  "owner": "local",
+  "metadata": {
+    "id": "mdms",
+    "name": "mdms",
+    "owner": "local",
+    "status": "ready"
+  }
+}

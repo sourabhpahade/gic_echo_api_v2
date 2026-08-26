@@ -10,12 +10,33 @@ router = APIRouter(prefix="/test", tags=["Page Index Endpoints"])
 # global variables
 base_dir = Path(settings.okf_bundles_dir).resolve()
 
-#LLM Pass 1: Selecting Relevant Databases
+
 @router.get("/get_processed_pageindex")
 async def get_relevant_databases(
     page_index_service: PageIndexService = Depends(get_page_index_service)
 ) :
 
-    result = await page_index_service.inspect_pageindex_tree()
+    # 1. Build the tree AND get the string identifier (e.g., "mdms_master")
+    active_id = await page_index_service.build_database_index()
+    
+    # 2. Pass that exact string into the chat client. 
+    # The client will silently go to .pageindex_storage/mdms_master.json to run the search.
+    #schema = page_index_service.extract_relevant_schema(user_query, active_doc_ids=[active_id])
+    
+    return active_id
 
-    return result
+
+@router.post("/get_schema")
+async def get_relevant_databases(
+    user_query,
+    page_index_service: PageIndexService = Depends(get_page_index_service)
+) :
+
+    # 1. Build the tree AND get the string identifier (e.g., "mdms_master")
+    active_id = await page_index_service.build_database_index()
+    
+    # 2. Pass that exact string into the chat client. 
+    # The client will silently go to .pageindex_storage/mdms_master.json to run the search.
+    schema = page_index_service.extract_relevant_schema(user_query, active_doc_ids=[active_id])
+    
+    return schema
