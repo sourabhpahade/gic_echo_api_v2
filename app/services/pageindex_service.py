@@ -1,3 +1,20 @@
+import typing
+
+# --- PYTHON 3.10 COMPATIBILITY PATCH ---
+# litellm requires 'NotRequired', which doesn't exist in Python 3.10's native typing module.
+# We fetch it from typing_extensions and inject it into the standard typing module in memory.
+try:
+    from typing import NotRequired
+except ImportError:
+    from typing_extensions import NotRequired
+    typing.NotRequired = NotRequired
+
+import sys
+print(f"--- RUNNING PYTHON ENV: {sys.executable} ---")
+
+# Force the raw import to expose the true hidden error
+import litellm
+
 import os
 import json
 from pageindex.page_index_md import md_to_tree

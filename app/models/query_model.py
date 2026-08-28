@@ -21,7 +21,7 @@ class QueryResponse(BaseModel):
 class ColumnDetail(BaseModel):
     column_name: str
     description: str
-    selection_reason: str  # <-- NEW: The "thought bucket"
+    selection_reason: str  =""# <-- NEW: The "thought bucket"
     
 class PrunedTableSchema(BaseModel):
     table_path: str = "" # We will inject this in Python, not the LLM

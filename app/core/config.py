@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     page_index_storage : str = ""
     page_index_bundle : str = ""
 
+    db_schema_path : str =""
+    db_relationship_path : str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"

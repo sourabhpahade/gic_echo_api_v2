@@ -5,6 +5,7 @@ from services.helper_service import HelperService
 from services.sql_execution_service import SQLExecutionService
 from services.data_analysis_service import DataAnalysisService
 from services.pageindex_service import PageIndexService
+from services.tree_based_llm_search_service import TreeBasedLLMSerach
 
 def get_llm_router_service() -> LLMRouterService:
     return LLMRouterService( 
@@ -23,3 +24,6 @@ def get_data_analysis_service() -> DataAnalysisService:
 
 def get_page_index_service() -> PageIndexService:
     return PageIndexService()
+
+def get_tree_based_llm_search_service() -> TreeBasedLLMSerach:
+    return TreeBasedLLMSerach()
