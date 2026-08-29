@@ -45,7 +45,7 @@
 ### Discom_Push_Date (datetime): Date and time when the meter installation details were pushed to the utility/discom.
 ### accntstatus_tblrefid (int, Enum: `1`='regular (CD)', `2`='temporary disconnected (TD)', `3`='permanent disconnected (PD)'): Stores the current account status of the consumer.
 
-## l_meter_lookup : This table contains the hardware records for all smart meters in the system which are active or inactive. It tracks the physical properties (manufacturer, phase, meter type), configuration (multiplying factor, net metering), and logical mappings to consumers, networks, and organizations.
+## l_meter_lookup : This table contains the hardware records for all smart meters in the system. It tracks the physical properties (manufacturer, phase, meter type), configuration (multiplying factor, net metering), and logical mappings to consumers, networks, and organizations. which are active or inactive meters.
 
 ### MeterLookup_TblRefID (int): PRIMARY KEY. Unique internal identity number for each smart meter.
 ### Consumer_TblRefID (int): FOREIGN KEY to `l_consumer_lookup`. Maps the smart meter to its attached consumer.
@@ -75,7 +75,7 @@
 ### IsActiveStatus (bit, Enum: `0`='No', `1`='Yes'): Indicates if the network entity is currently active.
 ### SUPPLY_VTG_TblRefID (int, Enum: `1`='11kv', `2`='33kv'): Stores the supply voltage capacity for the network.
 
-## l_organisation_lookup : This table contains the records for all utility organizations and offices (such as Circle, Division, Subdivision, and Section). It defines the strict hierarchy of these offices and how they nest within one another.
+## l_organisation_lookup : This table contains the records for all utility organizations and offices (such as Circle, Division, Subdivision, and Section). It defines the strict hierarchy of these offices and how they nest within one another. Note: There is no direct link between consumers and organizations. To link a consumer to an organization, you MUST use l_meter_lookup as a bridge table.
 
 ### OrganisationLookup_TblRefID (int): PRIMARY KEY. Unique internal identity number for each organization/office.
 ### Office_Code (varchar): Unique code assigned to the organization or office.
@@ -84,13 +84,13 @@
 ### OrganisationHierarchy_TblRefID (int): FOREIGN KEY to `m_organisation_hierarchy`. Stores the organization type and determines its level in the hierarchy (e.g., 1 being the top-level hierarchy, followed by subsequent numbers for lower levels).
 ### IsActiveStatus (bit, Enum: `0`='No', `1`='Yes'): Indicates if the organization is currently in an active state.
 
-## m_connection_category : This master lookup table defines the specific tariff codes and categorizations applied to consumers. It acts as the source of truth for classifying connections into business groups such as Domestic, Commercial, Agriculture, and Industrial.
+## m_connection_category : This master lookup table defines the specific tariff codes and categorizations applied to consumers. It acts as the source of truth for classifying connections into business groups such as Domestic, Commercial, Agriculture, and Industrial, Use this ONLY for grouping or listing consumer tariff categories.
 
 ### ConnectionCategory_TblRefID (int, Enum: `1`='KJ', `2`='KJ_BPL_MTR', `3`='DS1', `4`='DS1D', `5`='DS2D', `6`='DS3D', `7`='NDS1', `8`='NDS-IID(A)', `9`='NDS2D', `10`='LTIS1D', `11`='LTIS2D', `12`='IAS1', `13`='IAS2', `14`='PWWD', `15`='HGN', `16`='SS1D', `17`='LTEV', `18`='NDS1D', `19`='IAS2D'): PRIMARY KEY. Unique identifier for the connection category.
 ### ConnectionCategory_Code (varchar): UNIQUE. The standard shorthand code for the connection category (matches the ID enums).
 ### ConnectionCategory_Desc (varchar, Enum: `Kuteer Jyoti`, `Domestic`, `Commercial`, `LT Industrial`, `Agriculture`, `Public Water Works`, `Har Ghar Nal`, `Street Light`, `EV Charging`): The full descriptive name and classification of the connection category.
 
-## m_connection_status : This master lookup table defines the available connectivity statuses for a consumer's smart meter. It is used to filter consumers who are currently receiving power versus those who have been temporarily or permanently disconnected.
+## m_connection_status : It is used to filter consumers / meters who are currently receiving power versus those who have been temporarily or permanently disconnected. Do not use this table if only need active / inactive meters.
 
 ### ConnectionStatus_TblRefID (smallint, Enum: `1`='Connected', `2`='Disconnected', `3`='Permanent Disconnection'): PRIMARY KEY. Unique identifier for the connectivity state.
 ### ConnectionStatus_Name (varchar, Enum: `Connected`, `Disconnected`, `Permanent Disconnection`): The full descriptive name of the connectivity state.
