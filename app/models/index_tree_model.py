@@ -23,9 +23,39 @@ class SelectedRelationshipSource(BaseModel):
 
 # --- Final Output Model ---
 class Phase1RoutingResult(BaseModel):
-    selection_reason: str = Field(..., description="Master Plan: Detailed explanation of the query intent. MUST be generated first.")
+    master_plan: str = Field(..., description="Write a single paragraph explaining the required tables, their parent databases, and the join strategy.")
     selected_databases: List[SelectedDatabase] = Field(...)
+    # The Arrays
+    selected_databases: List[SelectedDatabase] = Field(..., description="Hierarchical list of databases and their selected tables.")
     selected_relationships: Optional[List[SelectedRelationshipSource]] = Field(
         default_factory=list, 
         description="Hierarchical list of Source Tables and their Joins. Return [] if no joins are needed."
+    )
+
+# --- Phase 2 Column Pruning Models ---
+
+class PrunedColumn(BaseModel):
+    node_id: str = Field(..., description="The exact node_id of the column.")
+    title: str = Field(..., description="The exact title/string of the column.")
+
+class PrunedTable(BaseModel):
+    node_id: str = Field(..., description="The exact node_id of the table.")
+    title: str = Field(..., description="The exact title of the table.")
+    columns: List[PrunedColumn] = Field(..., description="List of retained columns required for the query or joins.")
+
+class PrunedDatabase(BaseModel):
+    node_id: str = Field(..., description="The exact node_id of the database.")
+    title: str = Field(..., description="The exact title of the database.")
+    tables: List[PrunedTable] = Field(..., description="List of tables containing the pruned columns.")
+
+# --- Phase 2 Column Pruning Models ---
+
+class Phase2PruningResult(BaseModel):
+    pruning_reason: str = Field(
+        ..., 
+        description="Explain why specific columns were kept, explicitly mentioning join keys and query requirements."
+    )
+    retained_column_node_ids: List[str] = Field(
+        ..., 
+        description="A flat list containing ONLY the exact node_ids of the columns you want to keep."
     )

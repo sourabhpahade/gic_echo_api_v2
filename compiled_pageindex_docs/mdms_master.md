@@ -324,3 +324,4 @@ JOIN l_organisation_lookup subdiv ON section.HigherOffice_ID = subdiv.Organisati
 JOIN l_organisation_lookup division ON subdiv.HigherOffice_ID = division.OrganisationLookup_TblRefID
 WHERE section.OrganisationHierarchy_TblRefID = 5;
 
+

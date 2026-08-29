@@ -1,9 +1,9 @@
 import os
 import logging
-from typing import Dict, Any, Optional,Set
+from typing import Dict, Any, Optional,Set,List
 from core.config import settings
 from pageindex.page_index_md import md_to_tree
-from models.index_tree_model import Phase1RoutingResult
+from models.index_tree_model import Phase1RoutingResult,Phase2PruningResult 
 from openai import AsyncOpenAI
 import json
 
@@ -64,41 +64,38 @@ class TreeBasedLLMSerach :
 
         #print(f"relationship tree : \n {self.db_relationship_tree['structure']} \n\n ")
 
-
+    
     def prune_schema_to_level2(self) -> list[dict]:
-        """
-        Creates a lightweight copy of the schema tree containing only:
-        - Level 1: Databases
-        - Level 2: Tables (with descriptions)
-        All Level 3 (Columns) nodes are stripped.
-        """
-
         tree_list = self.db_schema_tree if isinstance(self.db_schema_tree, list) else self.db_schema_tree.get("structure", [])
         pruned_tree = []
 
         for db_node in tree_list:
+            db_title_full = db_node.get("title", "")
+            # Extract just the DB name (e.g., "mdms_master" from "mdms_master : This database...")
+            db_name = db_title_full.split(" :")[0].strip() 
+
             db_copy = {
-                "title": db_node.get("title"),
+                "title": db_title_full,
                 "node_id": db_node.get("node_id"),
                 "nodes": []
             }
             
             # Level 2 traversal (Tables)
             for table_node in db_node.get("nodes", []):
+                # INJECT THE DB NAME DIRECTLY INTO THE TABLE TITLE
+                original_table_title = table_node.get("title", "")
                 table_copy = {
-                    "title": table_node.get("title"),
+                    "title": f"[DB: {db_name}] {original_table_title}",
                     "node_id": table_node.get("node_id")
-                    # Intentionally omit or empty "nodes" (Columns)
                 }
                 db_copy["nodes"].append(table_copy)
 
             pruned_tree.append(db_copy)
 
-
         #print(f"prunted db_schema tree : \n {pruned_tree} \n\n ")
-
+        
         return pruned_tree
-
+    
     def _collect_valid_node_ids(self, tree: Any) -> Set[str]:
         """Helper to recursively collect all valid node_ids from an index tree."""
         valid_ids = set()
@@ -127,62 +124,22 @@ class TreeBasedLLMSerach :
         rel_structure = self.db_relationship_tree if isinstance(self.db_relationship_tree, list) else self.db_relationship_tree.get("structure", [])
 
         # 2. Build system instructions and payload
-        """
         system_prompt = (
             "You are an expert MS SQL Database Architect and Semantic Router.\n"
             "Your task is to analyze a user query and determine the exact databases, tables, "
             "and join paths required to satisfy the request.\n\n"
             "Input Context Information:\n"
-            "1. DATABASE SCHEMA TREE (Pruned): Level 1 nodes are Databases. Level 2 nodes are Tables with descriptions.\n"
-            "2. RELATIONSHIP TREE: Defines join paths. Level 1 is Root. Level 2 nodes are the Source Tables. Level 3 nodes are the specific Join Logic to Target Tables.\n\n"
-            "CRITICAL ROUTING RULES (Strictly Enforced):\n"
-            "- ZERO SPECULATION: Do NOT select lookup tables (like payment contracts, categories, or status) unless the user query explicitly filters by them or asks for their labels. For a simple 'count of consumers', only the consumer table is needed.\n"
-            "- RELATIONSHIP NAVIGATION: To pick a join, find the Source Table at Level 2 of the Relationship Tree, then select the exact Target Join Logic at Level 3. \n"
-            "- ONLY SELECT JOINS (LEVEL 3): Never include a Level 1 or Level 2 parent node from the Relationship Tree in your 'selected_relationships' array. Only include the Level 3 nodes that contain the actual 'Join Logic'.\n"
-            "- SELF-CORRECTION: If your 'selection_reason' concludes that no joins are necessary, you MUST set 'selected_relationships' exactly to [] or null.\n"
-            "- CLOSED-LOOP JOINS: Every join in 'selected_relationships' MUST connect two tables that are BOTH explicitly listed in your 'selected_databases -> tables' array.\n\n"
-            "Output Structure (Valid JSON only - 'selection_reason' MUST be the first key):\n"
-            "{\n"
-            '  "selection_reason": "<Analyze the query and plan your join strategy HERE first>",\n'
-            '  "selected_databases": [\n'
-            "    {\n"
-            '      "node_id": "<database_node_id>",\n'
-            '      "title": "<database_title>",\n'
-            '      "tables": [\n'
-            "        {\n"
-            '          "node_id": "<table_node_id>",\n'
-            '          "title": "<table_title>"\n'
-            "        }\n"
-            "      ]\n"
-            "    }\n"
-            "  ],\n"
-            '  "selected_relationships": [\n'
-            "    {\n"
-            '      "node_id": "<Level_3_relationship_node_id>",\n'
-            '      "title": "<Level_3_relationship_title>"\n'
-            "    }\n"
-            "  ]\n"
-            "}"
-        )
-        """
-
-        system_prompt = (
-            "You are an expert MS SQL Database Architect and Semantic Router.\n"
-            "Your task is to analyze a user query and determine the exact databases, tables, "
-            "and join paths required to satisfy the request.\n\n"
-            "Input Context Information:\n"
-            "1. DATABASE SCHEMA TREE (Pruned): Level 1 nodes are Databases. Level 2 nodes are Tables with descriptions/keywords.\n"
+            "1. DATABASE SCHEMA TREE (Pruned): Level 1 nodes are Databases. Level 2 nodes are Tables. Note: Each table title begins with a tag like '[DB: mdms_master]' indicating its exact parent database.\n"
             "2. RELATIONSHIP TREE: Defines join paths. Level 1 is Root. Level 2 nodes are Source Tables. Level 3 nodes are specific Join Logic.\n\n"
             "CRITICAL ROUTING RULES (Strictly Enforced):\n"
-            "- ZERO SPECULATION: Do NOT select lookup tables unless the user query explicitly filters by them or asks for their labels.\n"
-            "- NO ATTRIBUTE GUESSING: Do not add tables just to search for dates, statuses, or IDs if those concepts are already covered by the keywords in the primary tables.\n"
-            "- EXACT MATCH STRINGS: When outputting a 'title', you MUST copy the EXACT, full string provided in the schema tree. Do not abbreviate or remove the descriptions.\n"
-            "- HIERARCHICAL RELATIONSHIPS: If a join is required, nest the Level 3 'Join Logic' under its corresponding Level 2 'Source Table'.\n"
-            "- SELF-CORRECTION: If your 'selection_reason' concludes no joins are necessary, set 'selected_relationships' exactly to [] or null.\n"
+            "- READ THE DB TAG: You MUST place a table under the database that matches its '[DB: ...]' tag. Never place a table in the wrong database.\n"
+            "- MANDATORY TABLES ARRAY: Every database listed in 'selected_databases' MUST contain a populated 'tables' array.\n"
+            "- ZERO SPECULATION: Do NOT select tables like 't_dailyconsumption' or 's_meter_commanddetails' unless the user asks for daily usage, billing, or commands. For a simple 'count of consumers', you only need the consumer lookup table and the payment contract lookup.\n"
+            "- EXACT MATCH STRINGS: When outputting a 'title', copy the EXACT string provided in the schema tree, including the '[DB: ...]' tag.\n"
             "- CLOSED-LOOP JOINS: Every join target MUST connect to a table explicitly listed in 'selected_databases -> tables'.\n\n"
-            "Output Structure (Valid JSON only - 'selection_reason' MUST be the first key):\n"
+            "Output Structure (Valid JSON only):\n"
             "{\n"
-            '  "selection_reason": "<Analyze the query and plan your join strategy HERE first>",\n'
+            '  "master_plan": "<Explain which tables you need, read their [DB: ] tags, and explain how they join>",\n'
             '  "selected_databases": [\n'
             "    {\n"
             '      "node_id": "<exact_database_node_id>",\n'
@@ -190,7 +147,7 @@ class TreeBasedLLMSerach :
             '      "tables": [\n'
             "        {\n"
             '          "node_id": "<exact_table_node_id>",\n'
-            '          "title": "<EXACT_full_table_string>"\n'
+            '          "title": "<EXACT_full_table_string_with_[DB]_tag>"\n'
             "        }\n"
             "      ]\n"
             "    }\n"
@@ -235,7 +192,7 @@ class TreeBasedLLMSerach :
 
         parsed_json = json.loads(raw_content)
 
-        print(f"llm pass 1 parsed response : \n {parsed_json} \n\n ")
+        #print(f"llm pass 1 parsed response : \n {parsed_json} \n\n ")
 
         routing_result = Phase1RoutingResult.model_validate(parsed_json)
 
@@ -289,3 +246,123 @@ class TreeBasedLLMSerach :
             routing_result.selected_relationships = valid_joins
 
         return routing_result
+
+    def extract_phase2_schema_payload(self, phase1_result: dict) -> List[Dict[str, Any]]:
+        """
+        Takes the routing result from Phase 1 and extracts the full tables (including columns)
+        from the original schema tree.
+        """
+        selected_map = {}
+        for db in phase1_result.get("selected_databases", []):
+            db_id = str(db.get("node_id"))
+            table_ids = {str(tbl.get("node_id")) for tbl in db.get("tables", [])}
+            selected_map[db_id] = table_ids
+
+        filtered_schema = []
+
+        # FIX: Extract the actual list from the dictionary structure
+        tree_list = self.db_schema_tree if isinstance(self.db_schema_tree, list) else self.db_schema_tree.get("structure", [])
+
+        # 2. Traverse the list, not the dict
+        for db_node in tree_list:
+            db_id = str(db_node.get("node_id"))
+            
+            # If this DB was selected in Phase 1
+            if db_id in selected_map:
+                db_copy = {
+                    "node_id": db_id,
+                    "title": db_node.get("title"),
+                    "nodes": [] 
+                }
+                
+                allowed_table_ids = selected_map[db_id]
+                
+                # Check the tables inside this DB
+                for table_node in db_node.get("nodes", []):
+                    table_id = str(table_node.get("node_id"))
+                    
+                    if table_id in allowed_table_ids:
+                        import copy
+                        table_copy = copy.deepcopy(table_node)
+                        db_copy["nodes"].append(table_copy)
+                
+                if db_copy["nodes"]:
+                    filtered_schema.append(db_copy)
+
+        return filtered_schema
+
+    async def execute_phase2_pruning(
+        self, 
+        user_query: str, 
+        extracted_schema: List[Dict[str, Any]], 
+        phase1_relationships: List[Any]
+    ) -> Phase2PruningResult:
+        """
+        Pass 2:
+        Takes the extracted schema (with all columns) and the required joins from Phase 1,
+        and prompts the LLM to prune unnecessary columns.
+        """
+        
+        # Convert relationships to a dictionary/list format for the prompt
+        # We handle both Pydantic models and dicts just in case
+        rel_dump = []
+        for rel in phase1_relationships:
+            if hasattr(rel, "model_dump"):
+                rel_dump.append(rel.model_dump())
+            elif hasattr(rel, "dict"):
+                rel_dump.append(rel.dict())
+            else:
+                rel_dump.append(rel)
+
+        system_prompt = (
+            "You are an Expert MS SQL Database Architect and Schema Optimizer.\n"
+            "Your task is to review a subset of a database schema and identify the exact columns "
+            "required to answer the user's query.\n\n"
+            "Input Context Information:\n"
+            "1. EXTRACTED SCHEMA: A JSON array of the selected Databases, Tables, and ALL their Columns.\n"
+            "2. REQUIRED JOINS: The specific relationships/join paths determined in Phase 1.\n\n"
+            "CRITICAL PRUNING RULES (Strictly Enforced):\n"
+            "- KEEP JOIN KEYS: You MUST retain the 'node_id' of any Primary Keys (PK) and Foreign Keys (FK) needed to "
+            "execute the 'REQUIRED JOINS'. If you drop a join key, the system will crash.\n"
+            "- KEEP QUERY TARGETS: Retain the 'node_id' of columns explicitly requested by the user (e.g., metrics, dates, statuses).\n"
+            "- DROP THE REST: Ignore audit columns (created_by, updated_at) or operational flags UNLESS needed for filtering.\n\n"
+            "Output Structure (Valid JSON only):\n"
+            "{\n"
+            "  \"pruning_reason\": \"<Explain why you kept specific columns for the query, and which join keys you preserved>\",\n"
+            "  \"retained_column_node_ids\": [\n"
+            "    \"<column_node_id_1>\",\n"
+            "    \"<column_node_id_2>\"\n"
+            "  ]\n"
+            "}"
+        )
+
+        user_content = {
+            "user_query": user_query,
+            "required_joins": rel_dump,
+            "extracted_schema": extracted_schema
+        }
+
+        print(f"Dispatching Phase 2 Column Pruning for query: '{user_query}' \n")
+
+        # Call local LLM with structured output
+        response = await self.client.chat.completions.create(
+            model=self.model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": json.dumps(user_content, indent=2)}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.0 
+        )
+
+        raw_content = response.choices[0].message.content or "{}"
+        print(f"LLM Pass 2 raw response: \n {raw_content} \n\n ")
+
+        parsed_json = json.loads(raw_content)
+        pruning_result = Phase2PruningResult.model_validate(parsed_json)
+        
+        # Count total columns retained for logging
+        total_cols = len(pruning_result.retained_column_node_ids)
+        print(f"Phase 2 complete. Retained {total_cols} critical columns.\n")
+
+        return pruning_result
